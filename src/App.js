@@ -1,47 +1,55 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import './App.css';
+import './App.css';  // Import the CSS file
 
 const App = () => {
-  const [data, setData] = useState('');
-  const [result, setResult] = useState('');
+  const [response, setResponse] = useState({});
+  const [dropdownValue, setDropdownValue] = useState('');
 
   const handleSubmit = async () => {
     try {
-      const response = await axios.post('https://bajaj-ddhn.onrender.com/bfhl', {
-        data: data.split(',').map(item => item.trim()) // Split input data into an array
-      });
-
-      const { numbers, alphabets, highest_lowercase_alphabet } = response.data;
-
-      // Format the results as plain text
-      const formattedResult = `
-        Numbers: ${numbers.join(', ')}
-        Alphabets: ${alphabets.join(', ')}
-        Highest Lowercase Alphabet: ${highest_lowercase_alphabet.join(', ')}
-      `;
-
-      setResult(formattedResult.trim());
+      const res = await axios.post('https://bajaj-ddhn.onrender.com/bfhl', { data: ['M', '1', '334', '4', 'B', 'Z', 'a'] });
+      setResponse(res.data);
     } catch (error) {
-      console.error('Error:', error);
-      setResult('An error occurred while processing your request.');
+      console.error('Error submitting data:', error);
     }
   };
 
+  const handleDropdownChange = (e) => {
+    setDropdownValue(e.target.value);
+  };
+
+  const formatResponse = () => {
+    let formattedResponse = '';
+
+    if (dropdownValue === 'numbers' && response.numbers) {
+      formattedResponse += `Numbers: ${response.numbers.join(', ')}`;
+    }
+
+    if (dropdownValue === 'alphabets' && response.alphabets) {
+      formattedResponse += `Alphabets: ${response.alphabets.join(', ')}`;
+    }
+
+    if (dropdownValue === 'highest_lowercase_alphabet' && response.highest_lowercase_alphabet) {
+      formattedResponse += `Highest Lowercase Alphabet: ${response.highest_lowercase_alphabet.join(', ')}`;
+    }
+
+    return formattedResponse;
+  };
+
   return (
-    <div className="App">
-      <h1>API Frontend</h1>
-      <textarea
-        value={data}
-        onChange={(e) => setData(e.target.value)}
-        rows="10"
-        cols="30"
-        placeholder="Enter comma-separated data here"
-      />
+    <div className="container">
+      <h1>ABCD123</h1> {/* Update this to your roll number */}
+      <textarea placeholder="Enter JSON here" />
       <button onClick={handleSubmit}>Submit</button>
-      <div className="result">
-        <h2>Result:</h2>
-        <pre>{result}</pre>
+      <select onChange={handleDropdownChange} value={dropdownValue}>
+        <option value="">Select...</option>
+        <option value="numbers">Numbers</option>
+        <option value="alphabets">Alphabets</option>
+        <option value="highest_lowercase_alphabet">Highest Lowercase Alphabet</option>
+      </select>
+      <div>
+        {formatResponse()}
       </div>
     </div>
   );
